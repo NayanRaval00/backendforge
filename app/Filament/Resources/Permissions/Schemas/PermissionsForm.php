@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Permissions\Schemas;
 
+use Filament\Forms\Components\Select;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 
@@ -14,9 +15,12 @@ class PermissionsForm
                 TextInput::make('name')
                     ->label('Permission Name')
                     ->required(),
-                TextInput::make('guard_name')
+                Select::make('guard_name')
                     ->label('Guard Name')
-                    ->required(),
+                    ->options([
+                        'web' => 'Web',
+                        'admin' => 'Admin',
+                    ])
             ]);
     }
 }

@@ -3,8 +3,10 @@
 namespace App\Filament\Resources\Users\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use Spatie\Permission\Models\Role;
 
 class UserForm
 {
@@ -18,10 +20,26 @@ class UserForm
                     ->label('Email address')
                     ->email()
                     ->required(),
-                DateTimePicker::make('email_verified_at'),
                 TextInput::make('password')
                     ->password()
-                    ->required(),
+                    ->hiddenOn('edit'),
+                Select::make('role')
+                    ->label('Role')
+                    ->options(
+                        Role::where('guard_name', 'web')
+                            ->pluck('name', 'name')
+                    )
+                    ->searchable()
+                    ->required()
+                    ->dehydrated(false)
+                    ->afterStateHydrated(function ($component, $record) {
+                        if ($record) {
+                            $component->state(
+                                $record->roles->first()?->name
+                            );
+                        }
+                    })
+
             ]);
     }
 }

@@ -11,6 +11,7 @@ use App\Filament\Resources\Users\Schemas\UserInfolist;
 use App\Filament\Resources\Users\Tables\UsersTable;
 use App\Models\User;
 use BackedEnum;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -36,7 +37,20 @@ class UserResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return UsersTable::configure($table);
+        return UsersTable::configure($table)->bulkActions([
+            DeleteBulkAction::make()
+                ->before(function ($records) {
+                    foreach ($records as $record) {
+                        activity()
+                            ->performedOn($record)
+                            ->causedBy(auth()->guard('admin')->user())
+                            ->withProperties([
+                                'role' => $record->roles->first()?->name,
+                            ])
+                            ->log('User deleted (bulk)');
+                    }
+                }),
+        ]);
     }
 
     public static function getRelations(): array
