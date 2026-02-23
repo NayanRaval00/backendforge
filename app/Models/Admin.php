@@ -4,15 +4,17 @@ namespace App\Models;
 
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class Admin extends Authenticatable implements FilamentUser
 {
-    use SoftDeletes, LogsActivity;
+    use SoftDeletes, LogsActivity, Notifiable;
+    protected $guard = 'admin'; // ← add this
+
     protected $fillable = [
         'name',
         'email',
